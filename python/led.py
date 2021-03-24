@@ -33,10 +33,10 @@ elif config.DEVICE == 'blinkstick':
 _gamma = np.load(config.GAMMA_TABLE_PATH)
 """Gamma lookup table used for nonlinear brightness correction"""
 
-_prev_pixels = np.tile(253, (3, config.N_PIXELS))
+_prev_pixels = np.tile(253, (4, config.N_PIXELS))
 """Pixel values that were most recently displayed on the LED strip"""
 
-pixels = np.tile(1, (3, config.N_PIXELS))
+pixels = np.tile(1, (4, config.N_PIXELS))
 """Pixel values for the LED strip"""
 
 _is_python_2 = int(platform.python_version_tuple()[0]) == 2
@@ -97,9 +97,9 @@ def _update_pi():
     # r = np.left_shift(p[0][:].astype(int), 8)
     # g = np.left_shift(p[1][:].astype(int), 8)
     # b = p[2][:].astype(int)
-    g = np.left_shift(p[1][:].astype(int), 8)
-    r = np.left_shift(p[0][:].astype(int), 8)
-    b = p[2][:].astype(int)
+    g = 5
+    r = 5
+    b = 5
     w = np.left_shift(p[1][:].astype(int), 16)
     rgb = np.bitwise_or(np.bitwise_or(r, g), b, w)
     # Update the pixels
