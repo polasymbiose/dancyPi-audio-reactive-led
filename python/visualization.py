@@ -96,11 +96,13 @@ g_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
                        alpha_decay=0.05, alpha_rise=0.3)
 b_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
                        alpha_decay=0.1, alpha_rise=0.5)
+w_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
+                       alpha_decay=0., alpha_rise=0.2)
 common_mode = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
                        alpha_decay=0.99, alpha_rise=0.01)
 p_filt = dsp.ExpFilter(np.tile(1, (3, config.N_PIXELS // 2)),
                        alpha_decay=0.1, alpha_rise=0.99)
-p = np.tile(1.0, (3, config.N_PIXELS // 2))
+p = np.tile(1.0, (4, config.N_PIXELS // 2))
 gain = dsp.ExpFilter(np.tile(0.01, config.N_FFT_BINS),
                      alpha_decay=0.001, alpha_rise=0.99)
 
@@ -115,6 +117,7 @@ def visualize_scroll(y):
     r = int(np.max(y[:len(y) // 3]))
     g = int(np.max(y[len(y) // 3: 2 * len(y) // 3]))
     b = int(np.max(y[2 * len(y) // 3:]))
+    w = int(np.max(y[2 * len(y) // 3:]))
     # Scrolling effect window
     p[:, 1:] = p[:, :-1]
     p *= 0.98
@@ -123,6 +126,7 @@ def visualize_scroll(y):
     p[0, 0] = r
     p[1, 0] = g
     p[2, 0] = b
+    p[3, 0] = w
     # Update the LED strip
     return np.concatenate((p[:, ::-1], p), axis=1)
 
