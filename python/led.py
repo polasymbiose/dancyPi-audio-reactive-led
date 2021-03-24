@@ -12,9 +12,8 @@ if config.DEVICE == 'esp8266':
 # Raspberry Pi controls the LED strip directly
 elif config.DEVICE == 'pi':
     from rpi_ws281x import *
-    strip = Adafruit_NeoPixel(config.N_PIXELS, config.LED_PIN,
-                                       config.LED_FREQ_HZ, config.LED_DMA,
-                                       config.LED_INVERT, config.BRIGHTNESS)
+     LED_STRIP = ws.SK6812W_STRIP
+    strip = PixelStrip(config.N_PIXELS, config.LED_PIN, config.LED_FREQ_HZ, config.LED_DMA, config.LED_INVERT, config.BRIGHTNESS, 0, LED_STRIP)
     strip.begin()
 elif config.DEVICE == 'blinkstick':
     from blinkstick import blinkstick
