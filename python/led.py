@@ -109,7 +109,7 @@ def _update_pi():
             continue
             
         # strip._led_data[i] = int(rgb[i])
-        strip.setPixelColor(i, Color(0, 0, 0, 255))
+        strip.setPixelColor(i, Color(r, g, b, w))
     _prev_pixels = np.copy(p)
     strip.show()
 
