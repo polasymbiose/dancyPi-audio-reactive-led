@@ -118,7 +118,7 @@ def visualize_scroll(y):
     # Scrolling effect window
     p[:, 1:] = p[:, :-1]
     p *= 0.98
-    p = gaussian_filter1d(p, sigma=0.2)
+    p = gaussian_filter1d(p, sigma=0.1)
     # Create new color originating at the center
     p[0, 0] = r
     p[1, 0] = g
