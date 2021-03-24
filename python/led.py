@@ -98,7 +98,7 @@ def _update_pi():
     g = np.left_shift(p[1][:].astype(int), 16)
     b = p[2][:].astype(int)
     w = np.left_shift(p[1][:].astype(int), 32)
-    rgb = np.bitwise_or(np.bitwise_or(r, g), b)
+    rgb = np.bitwise_or(np.bitwise_or(r, g), b, w)
     # Update the pixels
     for i in range(config.N_PIXELS):
         # Ignore pixels if they haven't changed (saves bandwidth)
