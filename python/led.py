@@ -95,9 +95,9 @@ def _update_pi():
     p = _gamma[pixels] if config.SOFTWARE_GAMMA_CORRECTION else np.copy(pixels)
     # Encode 24-bit LED values in 32 bit integers
     r = np.left_shift(p[0][:].astype(int), 8)
-    g = np.left_shift(p[1][:].astype(int), 16)
+    g = np.left_shift(p[1][:].astype(int), 8)
     b = p[2][:].astype(int)
-    w = np.left_shift(p[1][:].astype(int), 32)
+    w = np.left_shift(p[1][:].astype(int), 16)
     rgb = np.bitwise_or(np.bitwise_or(r, g), b, w)
     # Update the pixels
     for i in range(config.N_PIXELS):
