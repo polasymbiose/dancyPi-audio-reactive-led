@@ -33,10 +33,10 @@ elif config.DEVICE == 'blinkstick':
 _gamma = np.load(config.GAMMA_TABLE_PATH)
 """Gamma lookup table used for nonlinear brightness correction"""
 
-_prev_pixels = np.tile(253, (4, config.N_PIXELS))
+_prev_pixels = np.tile(253, (3, config.N_PIXELS))
 """Pixel values that were most recently displayed on the LED strip"""
 
-pixels = np.tile(1, (4, config.N_PIXELS))
+pixels = np.tile(1, (3, config.N_PIXELS))
 """Pixel values for the LED strip"""
 
 _is_python_2 = int(platform.python_version_tuple()[0]) == 2
@@ -94,14 +94,11 @@ def _update_pi():
     # Optional gamma correction
     p = _gamma[pixels] if config.SOFTWARE_GAMMA_CORRECTION else np.copy(pixels)
     # Encode 24-bit LED values in 32 bit integers
-    # r = np.left_shift(p[0][:].astype(int), 8)
-    # g = np.left_shift(p[1][:].astype(int), 16)
-    # b = p[2][:].astype(int)
-    r = 0
-    g = 0
-    b = 0
+    r = np.left_shift(p[0][:].astype(int), 8)
+    g = np.left_shift(p[1][:].astype(int), 16)
+    b = p[2][:].astype(int)
     w = np.left_shift(p[1][:].astype(int), 32)
-    rgb = np.bitwise_or(np.bitwise_or(r, g), b, w)
+    rgb = np.bitwise_or(np.bitwise_or(r, g), b)
     # Update the pixels
     for i in range(config.N_PIXELS):
         # Ignore pixels if they haven't changed (saves bandwidth)
