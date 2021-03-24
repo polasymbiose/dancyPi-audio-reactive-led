@@ -101,15 +101,15 @@ def _update_pi():
     r = 5
     b = 5
     w = np.left_shift(p[1][:].astype(int), 16)
-    rgb = np.bitwise_or(np.bitwise_or(w, w), b, w)
+    rgb = np.bitwise_or(np.bitwise_or(r, g), b, w)
     # Update the pixels
     for i in range(config.N_PIXELS):
         # Ignore pixels if they haven't changed (saves bandwidth)
         if np.array_equal(p[:, i], _prev_pixels[:, i]):
             continue
             
-        # strip._led_data[i] = int(rgb[i])
-        strip.setPixelColor(i, Color(5, 5, 5, int(rgb[i])))
+        strip._led_data[i] = int(rgb[i])
+        strip.setPixelColor(i, Color(0, 0, 0, 55))
     _prev_pixels = np.copy(p)
     strip.show()
 
