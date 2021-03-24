@@ -97,7 +97,7 @@ g_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
 b_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
                        alpha_decay=0.1, alpha_rise=0.5)
 w_filt = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
-                       alpha_decay=0., alpha_rise=0.2)
+                       alpha_decay=0.2, alpha_rise=0.2)
 common_mode = dsp.ExpFilter(np.tile(0.01, config.N_PIXELS // 2),
                        alpha_decay=0.99, alpha_rise=0.01)
 p_filt = dsp.ExpFilter(np.tile(1, (3, config.N_PIXELS // 2)),
