@@ -94,22 +94,24 @@ def _update_pi():
     # Optional gamma correction
     p = _gamma[pixels] if config.SOFTWARE_GAMMA_CORRECTION else np.copy(pixels)
     # Encode 24-bit LED values in 32 bit integers
-    # r = np.left_shift(p[0][:].astype(int), 8)
-    # g = np.left_shift(p[1][:].astype(int), 8)
-    # b = p[2][:].astype(int)
-    g = 5
-    r = 5
-    b = 5
-    w = np.left_shift(p[1][:].astype(int), 16)
+    r = np.left_shift(p[0][:].astype(int), 8)
+    g = np.left_shift(p[1][:].astype(int), 16)
+    b = p[2][:].astype(int)
+    # g = 5
+    # r = 5
+    # b = 5
+    w = p[2][:].astype(int)
+    test = p[0]
     rgb = np.bitwise_or(np.bitwise_or(r, g), b, w)
     # Update the pixels
     for i in range(config.N_PIXELS):
         # Ignore pixels if they haven't changed (saves bandwidth)
         if np.array_equal(p[:, i], _prev_pixels[:, i]):
             continue
-            
-        strip._led_data[i] = int(rgb[i])
-        strip.setPixelColor(i, Color(0, 0, 0, 55))
+
+        # strip._led_data[i] = int(rgb[i])
+        # print(int(rgb[i]))
+        strip.setPixelColor(i, Color(0, 0, 0, int(test[i])))
     _prev_pixels = np.copy(p)
     strip.show()
 

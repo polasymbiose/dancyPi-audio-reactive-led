@@ -130,6 +130,12 @@ def visualize_scroll(y):
     # Update the LED strip
     return np.concatenate((p[:, ::-1], p), axis=1)
 
+# def visualize_custom(y):
+#     for i in range(strip.numPixels()):
+#         strip.setPixelColor(i, color)  #Funktion rpi_ws281x.color wandelt DEC in BIN  um
+#         strip.show()
+#         time.sleep(wait_ms / 1000.0)
+
 
 def visualize_energy(y):
     """Effect that expands from the center with increasing sound energy"""
@@ -210,13 +216,18 @@ def microphone_update(audio_samples):
         led.pixels = np.tile(0, (3, config.N_PIXELS))
         led.update()
     else:
+        
+        # print('vol', vol)
         # Transform audio input into the frequency domain
         N = len(y_data)
+        # print(N)
         N_zeros = 2**int(np.ceil(np.log2(N))) - N
+        # print(N_zeros)
         # Pad with zeros until the next power of two
         y_data *= fft_window
         y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
         YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
+        # print(y_padded)
         # Construct a Mel filterbank from the FFT data
         mel = np.atleast_2d(YS).T * dsp.mel_y.T
         # Scale data to values more suitable for visualization
@@ -224,13 +235,17 @@ def microphone_update(audio_samples):
         mel = np.sum(mel, axis=0)
         mel = mel**2.0
         # Gain normalization
-        mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
-        mel /= mel_gain.value
-        mel = mel_smoothing.update(mel)
+        # mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
+        # mel /= mel_gain.value
+        # mel = mel_smoothing.update(mel)
         # Map filterbank output onto LED strip
+        # print(mel)
         output = visualization_effect(mel)
+        # time.sleep(0.008)
         led.pixels = output
         led.update()
+        x = np.linspace(config.MIN_FREQUENCY, config.MAX_FREQUENCY, len(mel))
+        # print('x', len(x))
         if config.USE_GUI:
             # Plot filterbank output
             x = np.linspace(config.MIN_FREQUENCY, config.MAX_FREQUENCY, len(mel))
@@ -246,7 +261,96 @@ def microphone_update(audio_samples):
         fps = frames_per_second()
         if time.time() - 0.5 > prev_fps_update:
             prev_fps_update = time.time()
-            print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
+            # print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
+
+def visualize_volume(y):
+    """Effect that maps the Mel filterbank frequencies onto the LED strip"""
+    global _prev_spectrum
+    # y = np.copy(interpolate(y, config.N_PIXELS // 2))
+    # common_mode.update(y)
+    # diff = y - _prev_spectrum
+    # _prev_spectrum = np.copy(y)
+    # # Color channel mappings
+    # r = r_filt.update(y - common_mode.value)
+    # g = np.abs(diff)
+    # b = b_filt.update(np.copy(y))
+    # # Mirror the color channels for symmetric output
+    # r = np.concatenate((r[::-1], r))
+    # g = np.concatenate((g[::-1], g))
+    # b = np.concatenate((b[::-1], b))
+    # output = np.array([r, g,b]) * 255
+    
+    for i in range(config.N_PIXELS):
+        # Ignore pixels if they haven't changed (saves bandwidth)
+
+        # strip._led_data[i] = int(rgb[i])
+        val = 255 if i <= y else 0
+        strip.setPixelColor(i, Color(0, 0, 0, val))
+    # _prev_pixels = np.copy(p)
+    strip.show()
+
+def microphone_updateOnlyVolume(audio_samples):
+    global y_roll, prev_rms, prev_exp, prev_fps_update
+    # Normalize samples between 0 and 1
+    y = audio_samples / 2.0**15
+    # Construct a rolling window of audio samples
+    y_roll[:-1] = y_roll[1:]
+    y_roll[-1, :] = np.copy(y)
+    y_data = np.concatenate(y_roll, axis=0).astype(np.float32)
+    
+    vol = np.max(np.abs(y_data))
+    if vol < config.MIN_VOLUME_THRESHOLD:
+        print('No audio input. Volume below threshold. Volume:', vol)
+        led.pixels = np.tile(0, (3, config.N_PIXELS))
+        led.update()
+    else:
+        
+        # print('vol', vol, round(vol * config.N_PIXELS))
+        # Transform audio input into the frequency domain
+        N = len(y_data)
+        # print(N)
+        N_zeros = 2**int(np.ceil(np.log2(N))) - N
+        # print(N_zeros)
+        # Pad with zeros until the next power of two
+        y_data *= fft_window
+        y_padded = np.pad(y_data, (0, N_zeros), mode='constant')
+        YS = np.abs(np.fft.rfft(y_padded)[:N // 2])
+        # print(y_padded)
+        # Construct a Mel filterbank from the FFT data
+        mel = np.atleast_2d(YS).T * dsp.mel_y.T
+        # Scale data to values more suitable for visualization
+        # mel = np.sum(mel, axis=0)
+        mel = np.sum(mel, axis=0)
+        mel = mel**2.0
+        # Gain normalization
+        # mel_gain.update(np.max(gaussian_filter1d(mel, sigma=1.0)))
+        # mel /= mel_gain.value
+        # mel = mel_smoothing.update(mel)
+        # Map filterbank output onto LED strip
+        # print(mel)
+        volPixels = round(vol * config.N_PIXELS)
+        visualization_effect(volPixels)
+        
+        
+        # time.sleep(0.008)
+        x = np.linspace(config.MIN_FREQUENCY, config.MAX_FREQUENCY, len(mel))
+        # print('x', len(x))
+        if config.USE_GUI:
+            # Plot filterbank output
+            x = np.linspace(config.MIN_FREQUENCY, config.MAX_FREQUENCY, len(mel))
+            mel_curve.setData(x=x, y=fft_plot_filter.update(mel))
+            # Plot the color channels
+            r_curve.setData(y=led.pixels[0])
+            g_curve.setData(y=led.pixels[1])
+            b_curve.setData(y=led.pixels[2])
+    if config.USE_GUI:
+        app.processEvents()
+    
+    if config.DISPLAY_FPS:
+        fps = frames_per_second()
+        if time.time() - 0.5 > prev_fps_update:
+            prev_fps_update = time.time()
+            # print('FPS {:.0f} / {:.0f}'.format(fps, config.FPS))
 
 
 # Number of audio samples to read every time frame
@@ -257,6 +361,8 @@ y_roll = np.random.rand(config.N_ROLLING_HISTORY, samples_per_frame) / 1e16
 
 if sys.argv[1] == "spectrum":
         visualization_type = visualize_spectrum
+if sys.argv[1] == "volume":
+        visualization_type = visualize_volume
 elif sys.argv[1] == "energy":
         visualization_type = visualize_energy
 elif sys.argv[1] == "scroll":

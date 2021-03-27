@@ -68,7 +68,7 @@ up with desired FPS value.
 Higher framerates improve "responsiveness" and reduce the latency of the
 visualization but are more computationally expensive.
 
-Low framerates are less computationally expensive, but the visualization may
+Low framerates are less computationally expensive, but the visualization mayw
 appear "sluggish" or out of sync with the audio being played if it is too low.
 
 The FPS should not exceed the maximum refresh rate of the LED strip, which
@@ -77,7 +77,7 @@ depends on how long the LED strip is.
 _max_led_FPS = int(((N_PIXELS * 30e-6) + 50e-6)**-1.0)
 assert FPS <= _max_led_FPS, 'FPS must be <= {}'.format(_max_led_FPS)
 
-MIN_FREQUENCY = 200
+MIN_FREQUENCY = 50
 """Frequencies below this value will be removed during audio processing"""
 
 MAX_FREQUENCY = 12000
